@@ -18,11 +18,12 @@ app.use(
 let proposals = []
 
 const Proposal = db.proposals;
-schedule.scheduleJob('*/10 * * * *', async function(){
+schedule.scheduleJob('0/10 * * * *', async function(){
+  console.log("Refreshing Proposals")
   proposals = await Proposal.findAll()
 })
 
-schedule.scheduleJob('*/5 * * * * *', async function(){
+schedule.scheduleJob('*/20 * * * * *', async function(){
   console.log("Fetching Records")
  const {data}= await axios.get(`https://api.github.com/repos/${process.env.REPO}/issues?per_page=${process.env.PER_PAGE}&labels=${process.env.LABELS}`)
  .catch(err=>{
