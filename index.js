@@ -19,10 +19,17 @@ let proposals = []
 
 const Proposal = db.proposals;
 proposals = await Proposal.findAll()
+.catch(()=>{
+  console.log("error in fetching proposal")
+})
+
 
 schedule.scheduleJob('* * * * *', async function () {
   console.log("Refreshing Proposals")
   proposals = await Proposal.findAll()
+  .catch(()=>{
+    console.log("error in fetching proposal")
+  })
 })
 
 schedule.scheduleJob('*/5 * * * * *', async function () {
@@ -42,7 +49,6 @@ schedule.scheduleJob('*/5 * * * * *', async function () {
     try {
       return data.find(issue => {
         const found = issue.title.includes(proposal.search)
-        // console.log(issue.title, proposal.search)
         if (found) {
           console.log("Proposal Matched", proposal.search)
           console.log("Issue Macthed", issue.title)
@@ -63,6 +69,7 @@ schedule.scheduleJob('*/5 * * * * *', async function () {
             })
           })
         }
+        return false
       })
     } catch (err) {
       console.log(err)
