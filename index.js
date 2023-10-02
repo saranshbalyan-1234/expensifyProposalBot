@@ -18,47 +18,52 @@ app.use(
 let proposals = []
 
 const Proposal = db.proposals;
-  proposals = await Proposal.findAll()
+proposals = await Proposal.findAll()
 
-schedule.scheduleJob('*/10 * * * *', async function(){
+schedule.scheduleJob('*/10 * * * *', async function () {
   console.log("Refreshing Proposals")
   proposals = await Proposal.findAll()
 })
 
-schedule.scheduleJob('*/20 * * * * *', async function(){
+schedule.scheduleJob('*/20 * * * * *', async function () {
   console.log("Fetching Records")
- const {data}= await axios.get(`https://api.github.com/repos/saranshbalyan-1234/assignment/issues?per_page=30&labels=Help%20Wanted`,{headers:{
-  'Authorization':`Bearer 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`,
-  'User-Agent': 'request'
-}})
- .catch(err=>{
-  console.log(err)
-})
-// console.log(data)
-
-const isFound = proposals.find(proposal=>{
-    return data.find(issue=>{
-     const found =  issue.title.includes(proposal.search)
-     console.log(issue.title,proposal.search)
-     if(found){
-      console.log("Proposal Matched",proposal.search)
-      console.log("Issue Macthed",issue.title)
-      axios.post(issue.comments_url,{body:proposal.proposal},{headers:{
-        'Authorization':`Bearer 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`,
-        'User-Agent': 'request'
-      }})
-      .then(()=>{
-        console.log("Proposal Submitted")
-        Proposal.destroy({where:{search:proposal.search}})
-      })
-      .catch(err=>{
-        console.log("Error in posting Proposal",err)
-      })
-      return true
-     }
-    })
+  const { data } = await axios.get(`https://api.github.com/repos/saranshbalyan-1234/assignment/issues?per_page=30&labels=Help%20Wanted`, {
+    headers: {
+      'Authorization': `Bearer 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`,
+      'User-Agent': 'request'
+    }
   })
-  console.log(isFound?"": "No Proposal Found")
+    .catch(err => {
+      console.log(err)
+    })
+  // console.log(data)
+
+  const isFound = proposals.find(proposal => {
+    try {
+      return data.find(async issue => {
+        const found = issue.title.includes(proposal.search)
+        console.log(issue.title, proposal.search)
+        if (found) {
+          console.log("Proposal Matched", proposal.search)
+          console.log("Issue Macthed", issue.title)
+          await axios.post(issue.comments_url, { body: proposal.proposal }, {
+            headers: {
+              'Authorization': `Bearer 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`,
+              'User-Agent': 'request'
+            }
+          })
+
+          await Proposal.destroy({ where: { search: proposal.search } })
+          proposals = await Proposal.findAll()
+          return true
+        }
+      })
+    } catch (err) {
+      console.log(err)
+    }
+  })
+  console.log(isFound ? "" : "No Proposal Found")
+
 });
 
 app.listen(process.env.PORT, () => {
