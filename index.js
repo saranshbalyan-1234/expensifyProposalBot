@@ -19,7 +19,7 @@ let proposals = []
 
 const Proposal = db.proposals;
   proposals = await Proposal.findAll()
-  
+
 schedule.scheduleJob('*/10 * * * *', async function(){
   console.log("Refreshing Proposals")
   proposals = await Proposal.findAll()
@@ -27,7 +27,10 @@ schedule.scheduleJob('*/10 * * * *', async function(){
 
 schedule.scheduleJob('*/20 * * * * *', async function(){
   console.log("Fetching Records")
- const {data}= await axios.get(`https://api.github.com/repos/${process.env.REPO}/issues?per_page=${process.env.PER_PAGE}&labels=${process.env.LABELS}`)
+ const {data}= await axios.get(`https://api.github.com/repos/saranshbalyan-1234/assignment/issues?per_page=30&labels=Help%20Wanted`,{headers:{
+  'Authorization':`Bearer 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`,
+  'User-Agent': 'request'
+}})
  .catch(err=>{
   console.log(err)
 })
@@ -41,7 +44,7 @@ const isFound = proposals.find(proposal=>{
       console.log("Proposal Matched",proposal.search)
       console.log("Issue Macthed",issue.title)
       axios.post(issue.comments_url,{body:proposal.proposal},{headers:{
-        'Authorization':`Bearer ${process.env.GHToken}`,
+        'Authorization':`Bearer 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`,
         'User-Agent': 'request'
       }})
       .then(()=>{
