@@ -20,7 +20,7 @@ let proposals = []
 const Proposal = db.proposals;
 proposals = await Proposal.findAll()
 
-schedule.scheduleJob('*/10 * * * *', async function () {
+schedule.scheduleJob('* * * * *', async function () {
   console.log("Refreshing Proposals")
   proposals = await Proposal.findAll()
 })
