@@ -26,7 +26,7 @@ schedule.scheduleJob('* * * * *', async function () {
 })
 
 schedule.scheduleJob('*/5 * * * * *', async function () {
-  console.log("Fetching Records")
+  console.log("Fetching Issues")
   const { data } = await axios.get(`https://api.github.com/repos/Expensify/App/issues?per_page=30&labels=Help%20Wanted`, {
     headers: {
       'Authorization': `Bearer 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`,
@@ -40,22 +40,28 @@ schedule.scheduleJob('*/5 * * * * *', async function () {
 
   const isFound = proposals.find(proposal => {
     try {
-      return data.find(async issue => {
+      return data.find(issue => {
         const found = issue.title.includes(proposal.search)
         // console.log(issue.title, proposal.search)
         if (found) {
           console.log("Proposal Matched", proposal.search)
           console.log("Issue Macthed", issue.title)
-          await axios.post(issue.comments_url, { body: proposal.proposal }, {
+           axios.post(issue.comments_url, { body: proposal.proposal }, {
             headers: {
               'Authorization': `Bearer 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`,
               'User-Agent': 'request'
             }
           })
-
-          await Proposal.destroy({ where: { search: proposal.search } })
-          proposals = await Proposal.findAll()
-          return true
+          .then(()=>{
+            Proposal.destroy({ where: { search: proposal.search } })
+            .then(()=>{
+              Proposal.findAll()
+              .then(res=>{
+                proposals =res
+                return true
+              })
+            })
+          })
         }
       })
     } catch (err) {
