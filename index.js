@@ -27,7 +27,7 @@ schedule.scheduleJob('*/10 * * * *', async function () {
 
 schedule.scheduleJob('*/20 * * * * *', async function () {
   console.log("Fetching Records")
-  const { data } = await axios.get(`https://api.github.com/repos/saranshbalyan-1234/assignment/issues?per_page=30&labels=Help%20Wanted`, {
+  const { data } = await axios.get(`https://api.github.com/repos/Expensify/App/issues?per_page=30&labels=Help%20Wanted`, {
     headers: {
       'Authorization': `Bearer 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`,
       'User-Agent': 'request'
@@ -42,7 +42,7 @@ schedule.scheduleJob('*/20 * * * * *', async function () {
     try {
       return data.find(async issue => {
         const found = issue.title.includes(proposal.search)
-        console.log(issue.title, proposal.search)
+        // console.log(issue.title, proposal.search)
         if (found) {
           console.log("Proposal Matched", proposal.search)
           console.log("Issue Macthed", issue.title)
