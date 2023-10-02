@@ -25,7 +25,7 @@ schedule.scheduleJob('*/10 * * * *', async function () {
   proposals = await Proposal.findAll()
 })
 
-schedule.scheduleJob('*/20 * * * * *', async function () {
+schedule.scheduleJob('*/5 * * * * *', async function () {
   console.log("Fetching Records")
   const { data } = await axios.get(`https://api.github.com/repos/Expensify/App/issues?per_page=30&labels=Help%20Wanted`, {
     headers: {
